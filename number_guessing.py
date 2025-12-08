@@ -6,6 +6,9 @@ def give_hint(secret):
     else:
         print("ℹ️ Hint: The secret number is ODD.")
 
+def show_attempts(attempts):
+    print("Your attempts so far:", attempts)
+
 secret = random.randint(1, 100)
 attempts = []
 
