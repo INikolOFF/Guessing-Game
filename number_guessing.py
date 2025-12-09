@@ -9,6 +9,11 @@ def give_hint(secret):
 def show_attempts(attempts):
     print("Your attempts so far:", attempts)
 
+# New function: show difference between last guess and secret
+def show_difference(secret, last_guess):
+    diff = abs(secret - last_guess)
+    print(f"🔍 You're {diff} away from the secret number.")
+
 secret = random.randint(1, 100)
 attempts = []
 
@@ -19,6 +24,10 @@ while True:
     guess = int(input("Your guess: "))
     attempts.append(guess)
 
+    if guess == 0:
+        give_hint(secret)
+        continue
+
     if guess < secret:
         print("Higher!")
     elif guess > secret:
@@ -27,3 +36,6 @@ while True:
         print(f"Correct! The number was {secret}.")
         print(f"You guessed it in {len(attempts)} attempts.")
         break
+
+    show_attempts(attempts)
+    show_difference(secret, guess)
