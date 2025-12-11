@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Purpose of this project
 
 This game is intentionally simple.
@@ -21,3 +22,28 @@ Author
 
 Created by Dimitar Nikolov
 GitHub: https://github.com/INikolOFF
+=======
+# Guess the Number Game
+
+A simple interactive game where the player has to guess a randomly chosen number between 1 and 100. 
+
+## Features
+
+- Get hints if the number is even or odd
+- Keep track of all previous attempts
+- Shows how far your last guess is from the secret number (new feature)
+- Interactive console-based gameplay
+
+## How to Play
+
+1. Run the Python script.
+2. Enter your guess.
+3. Type \`0\` if you want a hint.
+4. Keep guessing until you find the secret number.
+
+git add README.md number_guessing.py
+
+
+
+
+>>>>>>> 4ff822c (New function)
