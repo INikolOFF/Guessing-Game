@@ -1,6 +1,4 @@
 Purpose of this project
-
-This game is intentionally simple.
 It is designed as practice for beginners, helping them understand:
 	•	how to use functions
 	•	how to work with lists
