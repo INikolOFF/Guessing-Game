@@ -13,6 +13,17 @@ def show_attempts(attempts):
 def show_difference(secret, last_guess):
     diff = abs(secret - last_guess)
     print(f"🔍 You're {diff} away from the secret number.")
+# show_trend(secret, attempts) tells the player if their last guess
+# is closer or further from the secret number compared to the previous guess.
+def show_trend(secret, attempts):
+    if len(attempts) < 2:
+        return
+    prev_diff = abs(secret - attempts[-2])
+    curr_diff = abs(secret - attempts[-1])
+    if curr_diff < prev_diff:
+        print("🔥 You're getting closer!")
+    elif curr_diff > prev_diff:
+        print("❄️ You're moving away!")
 
 secret = random.randint(1, 100)
 attempts = []
