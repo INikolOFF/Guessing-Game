@@ -1,76 +1,81 @@
+import tkinter as tk
 import random
+from tkinter import messagebox
 
-# Ask the player to choose difficulty
-print("Choose difficulty level:")
-print("1 = Easy (1–50)")
-print("2 = Medium (1–100)")
-print("3 = Hard (1–200)")
+# Game variables
+secret_number = 0
+attempts = 0
+max_range = 100
 
-choice = input("Your choice: ")
+# Start new game
+def start_game():
+    global secret_number, attempts, max_range
 
-if choice == "1":
-    max_range = 50
-    base_score = 120
-    print("🔵 Difficulty: EASY")
-elif choice == "2":
-    max_range = 100
-    base_score = 100
-    print("🟡 Difficulty: MEDIUM")
-else:
-    max_range = 200
-    base_score = 80
-    print("🔴 Difficulty: HARD")
+    attempts = 0
 
-def give_hint(secret):
-    if secret % 2 == 0:
-        print("ℹ️ Hint: The secret number is EVEN.")
+    # Choose difficulty
+    if difficulty_var.get() == "Easy":
+        max_range = 50
+    elif difficulty_var.get() == "Medium":
+        max_range = 100
     else:
-        print("ℹ️ Hint: The secret number is ODD.")
+        max_range = 200
 
-def show_attempts(attempts):
-    print("Your attempts so far:", attempts)
+    # Generate number
+    secret_number = random.randint(1, max_range)
 
-def show_difference(secret, last_guess):
-    diff = abs(secret - last_guess)
-    print(f"🔍 You're {diff} away from the secret number.")
+    result_label.config(text=f"Guess number 1–{max_range}")
+    attempts_label.config(text="Attempts: 0")
 
-def show_trend(secret, attempts):
-    if len(attempts) < 2:
+# Check guess
+def make_guess():
+    global attempts
+
+    try:
+        guess = int(guess_entry.get())
+    except ValueError:
+        messagebox.showerror("Error", "Enter a number")
         return
-    prev_diff = abs(secret - attempts[-2])
-    curr_diff = abs(secret - attempts[-1])
-    if curr_diff < prev_diff:
-        print("🔥 You're getting closer!")
-    elif curr_diff > prev_diff:
-        print("❄️ You're moving away!")
 
-# Updated scoring depending on difficulty
-def calculate_score(attempts, base_score):
-    score = max(0, base_score - (len(attempts) - 1) * 10)
-    return score
+    attempts += 1
+    attempts_label.config(text=f"Attempts: {attempts}")
 
-secret = random.randint(1, max_range)
-attempts = []
-
-print(f"🎲 Guess the number between 1 and {max_range}!")
-print("Type 0 if you want a hint!")
-
-while True:
-    guess = int(input("Your guess: "))
-    attempts.append(guess)
-
-    if guess == 0:
-        give_hint(secret)
-        continue
-
-    if guess < secret:
-        print("Higher!")
-    elif guess > secret:
-        print("Lower!")
+    if guess < secret_number:
+        result_label.config(text="Higher")
+    elif guess > secret_number:
+        result_label.config(text="Lower")
     else:
-        print(f"Correct! The number was {secret}.")
-        print(f"You guessed it in {len(attempts)} attempts.")
-        score = calculate_score(attempts, base_score)
-        print(f"🏆 Your score: {score}")
-        break
-    show_trend(secret, attempts)
+        result_label.config(text=f"Correct! Number was {secret_number}")
+        messagebox.showinfo("Win", f"You won in {attempts} attempts")
+
+# Create window
+root = tk.Tk()
+root.title("Guess the Number")
+root.geometry("350x300")
+
+# Difficulty
+tk.Label(root, text="Difficulty").pack()
+
+difficulty_var = tk.StringVar(value="Medium")
+
+tk.Radiobutton(root, text="Easy", variable=difficulty_var, value="Easy").pack()
+tk.Radiobutton(root, text="Medium", variable=difficulty_var, value="Medium").pack()
+tk.Radiobutton(root, text="Hard", variable=difficulty_var, value="Hard").pack()
+
+# Buttons and input
+tk.Button(root, text="Start Game", command=start_game).pack(pady=10)
+
+guess_entry = tk.Entry(root)
+guess_entry.pack()
+
+tk.Button(root, text="Guess", command=make_guess).pack(pady=5)
+
+# Info labels
+result_label = tk.Label(root, text="")
+result_label.pack(pady=10)
+
+attempts_label = tk.Label(root, text="Attempts: 0")
+attempts_label.pack()
+
+# Run app
+root.mainloop()
