@@ -35,13 +35,16 @@ A simple interactive game where the player has to guess a randomly chosen number
 3. Type \`0\` if you want a hint.
 4. Keep guessing until you find the secret number.
 
-# Author
-
-Created by Dimitar Nikolov
-GitHub: https://github.com/INikolOFF
-=======
-
-
+New Features & Improvements
+	•	Modern UI with colored frames, labels, and buttons
+	•	Three difficulty levels: Easy (1–50), Medium (1–100), Hard (1–200)
+	•	Dynamic hints: “Very close!”, “Close!”, “Go much higher/lower!”
+	•	Guess history: shows last 8 guesses with “…” if more
+	•	Tracks best scores per difficulty with trophy notification
+	•	Input validation to prevent invalid numbers
+	•	Disables input/buttons after winning
+	•	Emoji & color feedback for a more engaging experience
+	•	Replayable: start a new game anytime
 
 
 
