@@ -36,6 +36,7 @@ A simple interactive game where the player has to guess a randomly chosen number
 4. Keep guessing until you find the secret number.
 
 New Features & Improvements
+
 	•	Modern UI with colored frames, labels, and buttons
 	•	Three difficulty levels: Easy (1–50), Medium (1–100), Hard (1–200)
 	•	Dynamic hints: “Very close!”, “Close!”, “Go much higher/lower!”
