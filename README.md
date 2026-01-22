@@ -11,10 +11,10 @@ The code is commented and easy to follow.
   Future improvements (optional ideas)
 ✓	•	Add difficulty levels (easy, medium, hard)
 ✓	•	Add a scoring system based on attempts
-	•	Add time tracking for each game
+✓	•	Add time tracking for each game
 	•	Save game statistics to a file
 	•	Add colored terminal output
-	ç   
+	   
 
 
 A simple interactive game where the player has to guess a randomly chosen number between 1 and 100. 
@@ -27,6 +27,7 @@ A simple interactive game where the player has to guess a randomly chosen number
 - Interactive console-based gameplay
 - Add a scoring system based on attempts
 - After each guess, it checks whether the player is getting closer or further away
+
 
 ## How to Play
 
@@ -46,6 +47,9 @@ New Features & Improvements
 	•	Disables input/buttons after winning
 	•	Emoji & color feedback for a more engaging experience
 	•	Replayable: start a new game anytime
+	•	Keyboard Shortcuts - Enter → Submit guess, Ctrl + N → Start new game, 
+		Ctrl + R → Restart game, Esc → Exit application
+		
 
 
 
