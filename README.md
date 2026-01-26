@@ -27,6 +27,12 @@ A simple interactive game where the player has to guess a randomly chosen number
 - Interactive console-based gameplay
 - Add a scoring system based on attempts
 - After each guess, it checks whether the player is getting closer or further away
+- 11:13 PMGuess history - Shows all previous attempts with proximity indicators
+- Proximity hints - Dynamic feedback based on distance to target number
+- Persistent statistics - Best scores saved to file across sessions
+- Duplicate prevention - Warns if you try the same number twice
+- Enhanced UI - Color-coded feedback, improved fonts and button styling
+- Better notifications - Detailed win messages and record tracking  
 
 
 ## How to Play
