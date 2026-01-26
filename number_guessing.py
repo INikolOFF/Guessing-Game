@@ -1,13 +1,15 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, scrolledtext
 import random
+import json
+import os
 
 
 class GuessNumberGame:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("🎯 Guess the Number")
-        self.window.geometry("450x600")
+        self.window.geometry("550x700")
         self.window.resizable(False, False)
         self.window.configure(bg="#1a1a2e")
 
@@ -17,9 +19,26 @@ class GuessNumberGame:
         self.best_scores = {"Easy": None, "Medium": None, "Hard": None}
         self.guess_history = []
         self.game_active = False
+        self.stats_file = "guess_stats.json"
 
+        self.load_stats()
         self.setup_ui()
         self.bind_shortcuts()
+
+    def load_stats(self):
+        if os.path.exists(self.stats_file):
+            try:
+                with open(self.stats_file, 'r') as f:
+                    self.best_scores = json.load(f)
+            except:
+                pass
+
+    def save_stats(self):
+        try:
+            with open(self.stats_file, 'w') as f:
+                json.dump(self.best_scores, f)
+        except:
+            pass
 
     def bind_shortcuts(self):
         self.window.bind("<Return>", lambda e: self.make_guess())
@@ -68,6 +87,7 @@ class GuessNumberGame:
                 bg="#0f3460",
                 fg="white",
                 selectcolor="#16213e",
+                font=("Arial", 10),
                 command=self.update_difficulty_display
             ).pack(anchor="w", pady=3)
 
@@ -78,7 +98,8 @@ class GuessNumberGame:
             font=("Arial", 14, "bold"),
             bg="#00ff88",
             fg="#1a1a2e",
-            height=2
+            height=2,
+            cursor="hand2"
         )
         self.start_btn.pack(pady=15, fill="x")
 
@@ -98,7 +119,8 @@ class GuessNumberGame:
             info_frame,
             text="Attempts: 0",
             bg="#0f3460",
-            fg="white"
+            fg="white",
+            font=("Arial", 11)
         )
         self.attempts_label.pack(pady=5)
 
@@ -106,7 +128,8 @@ class GuessNumberGame:
             info_frame,
             text="Best Score: -",
             bg="#0f3460",
-            fg="#ffd700"
+            fg="#ffd700",
+            font=("Arial", 11, "bold")
         )
         self.best_score_label.pack()
 
@@ -117,7 +140,8 @@ class GuessNumberGame:
             input_frame,
             text="Your Guess:",
             bg="#1a1a2e",
-            fg="white"
+            fg="white",
+            font=("Arial", 11)
         ).pack()
 
         self.guess_entry = tk.Entry(
@@ -133,7 +157,10 @@ class GuessNumberGame:
             text="🎲 GUESS (Enter)",
             command=self.make_guess,
             font=("Arial", 12, "bold"),
-            state="disabled"
+            state="disabled",
+            cursor="hand2",
+            bg="#4CAF50",
+            fg="white"
         )
         self.guess_btn.pack(pady=10)
 
@@ -150,20 +177,70 @@ class GuessNumberGame:
             main_container,
             text="",
             bg="#1a1a2e",
-            fg="#aaa"
+            fg="#aaa",
+            font=("Arial", 10)
         )
         self.hint_label.pack()
 
+        # История на опитите
+        history_frame = tk.LabelFrame(
+            main_container,
+            text="📜 Guess History",
+            font=("Arial", 10, "bold"),
+            bg="#0f3460",
+            fg="#00ff88",
+            padx=10,
+            pady=10
+        )
+        history_frame.pack(pady=10, fill="both", expand=True)
+
+        self.history_text = scrolledtext.ScrolledText(
+            history_frame,
+            height=6,
+            font=("Courier", 9),
+            bg="#16213e",
+            fg="#00ff88",
+            state="disabled"
+        )
+        self.history_text.pack(fill="both", expand=True)
+
     def update_difficulty_display(self):
-        best = self.best_scores[self.difficulty_var.get()]
+        best = self.best_scores.get(self.difficulty_var.get())
         self.best_score_label.config(
             text=f"Best Score: {best}" if best else "Best Score: -"
         )
+
+    def get_proximity_hint(self, difference):
+        if difference == 0:
+            return "🎯 PERFECT!"
+        elif difference <= 3:
+            return "🔥 МНОГО ГОРЕЩО!"
+        elif difference <= 10:
+            return "🌡️ Горещо!"
+        elif difference <= 20:
+            return "💨 Топло"
+        elif difference <= 50:
+            return "❄️ Студено"
+        else:
+            return "🧊 Много студено"
+
+    def add_to_history(self, guess, result):
+        self.history_text.config(state="normal")
+        difference = abs(guess - self.secret_number)
+        proximity = self.get_proximity_hint(difference)
+
+        entry = f"#{self.attempts}: {guess} → {result} | {proximity}\n"
+        self.history_text.insert("1.0", entry)
+        self.history_text.config(state="disabled")
 
     def start_game(self):
         self.attempts = 0
         self.guess_history.clear()
         self.game_active = True
+
+        self.history_text.config(state="normal")
+        self.history_text.delete("1.0", tk.END)
+        self.history_text.config(state="disabled")
 
         difficulty = self.difficulty_var.get()
         self.max_range = {"Easy": 50, "Medium": 100, "Hard": 200}[difficulty]
@@ -171,7 +248,7 @@ class GuessNumberGame:
 
         self.range_label.config(text=f"Guess a number between 1 and {self.max_range}")
         self.attempts_label.config(text="Attempts: 0")
-        self.result_label.config(text="Good luck!")
+        self.result_label.config(text="Good luck! 🍀", fg="white")
         self.hint_label.config(text="")
         self.guess_btn.config(state="normal")
         self.guess_entry.config(state="normal")
@@ -190,27 +267,52 @@ class GuessNumberGame:
             return
 
         if not 1 <= guess <= self.max_range:
-            messagebox.showwarning("Out of range", f"1–{self.max_range}")
+            messagebox.showwarning("Out of range", f"Please enter a number between 1 and {self.max_range}")
             return
 
+        if guess in self.guess_history:
+            messagebox.showinfo("Already tried", f"You already tried {guess}!")
+            self.guess_entry.delete(0, tk.END)
+            return
+
+        self.guess_history.append(guess)
         self.attempts += 1
         self.attempts_label.config(text=f"Attempts: {self.attempts}")
 
+        difference = abs(guess - self.secret_number)
+
         if guess < self.secret_number:
-            self.result_label.config(text="📈 TOO LOW")
+            result = "📈 TOO LOW"
+            self.result_label.config(text=result, fg="#ff6b6b")
+            self.add_to_history(guess, "Low")
+            proximity = self.get_proximity_hint(difference)
+            self.hint_label.config(text=proximity)
         elif guess > self.secret_number:
-            self.result_label.config(text="📉 TOO HIGH")
+            result = "📉 TOO HIGH"
+            self.result_label.config(text=result, fg="#4ecdc4")
+            self.add_to_history(guess, "High")
+            proximity = self.get_proximity_hint(difference)
+            self.hint_label.config(text=proximity)
         else:
             self.game_active = False
-            self.result_label.config(text=f"🎉 CORRECT! {self.secret_number}")
-            self.hint_label.config(text=f"Attempts: {self.attempts}")
+            self.result_label.config(text=f"🎉 CORRECT! The number was {self.secret_number}", fg="#00ff88")
+            self.hint_label.config(text=f"You won in {self.attempts} attempts!")
+            self.add_to_history(guess, "✓ WIN")
             self.guess_btn.config(state="disabled")
             self.guess_entry.config(state="disabled")
 
             diff = self.difficulty_var.get()
-            if not self.best_scores[diff] or self.attempts < self.best_scores[diff]:
+            current_best = self.best_scores.get(diff)
+
+            if not current_best or self.attempts < current_best:
                 self.best_scores[diff] = self.attempts
-                messagebox.showinfo("New Record!", "🏆 New best score!")
+                self.save_stats()
+                self.update_difficulty_display()
+                messagebox.showinfo("New Record! 🏆",
+                                    f"Congratulations! New best score: {self.attempts} attempts!")
+            else:
+                messagebox.showinfo("Victory! 🎉",
+                                    f"You won in {self.attempts} attempts!\nBest score: {current_best}")
 
         self.guess_entry.delete(0, tk.END)
         self.guess_entry.focus()
