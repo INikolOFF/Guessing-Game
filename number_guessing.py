@@ -9,7 +9,7 @@ class GuessNumberGame:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("🎯 Guess the Number")
-        self.window.geometry("550x700")
+        self.window.geometry("550x750")
         self.window.resizable(False, False)
         self.window.configure(bg="#1a1a2e")
 
@@ -164,6 +164,29 @@ class GuessNumberGame:
         )
         self.guess_btn.pack(pady=10)
 
+        progress_frame = tk.LabelFrame(
+            main_container,
+            text="🎯 Proximity Meter",
+            font=("Arial", 13, "bold"),
+            bg="#0f3460",
+            fg="#00ff88",
+            padx=10,
+            pady=10
+        )
+        progress_frame.pack(pady=10, fill="x")
+
+        self.progress_canvas = tk.Canvas(
+            progress_frame,
+            height=30,
+            bg="#16213e",
+            highlightthickness=0
+        )
+        self.progress_canvas.pack(fill="x")
+
+        self.progress_bar = self.progress_canvas.create_rectangle(
+            0, 0, 0, 30, fill="#00ff88", outline=""
+        )
+
         self.result_label = tk.Label(
             main_container,
             text="",
@@ -182,17 +205,16 @@ class GuessNumberGame:
         )
         self.hint_label.pack()
 
-        # История на опитите
         history_frame = tk.LabelFrame(
             main_container,
             text="📜 Guess History",
-            font=("Arial", 10, "bold"),
+            font=("Arial", 13, "bold"),
             bg="#0f3460",
             fg="#00ff88",
             padx=10,
             pady=10
         )
-        history_frame.pack(pady=10, fill="both", expand=True)
+        history_frame.pack(pady=1, fill="both", expand=True)
 
         self.history_text = scrolledtext.ScrolledText(
             history_frame,
@@ -224,6 +246,25 @@ class GuessNumberGame:
         else:
             return "🧊 Много студено"
 
+    def update_progress_bar(self, difference):
+        max_diff = self.max_range
+        proximity = max(0, 1 - (difference / max_diff))
+
+        width = self.progress_canvas.winfo_width()
+        bar_width = width * proximity
+
+        if proximity > 0.9:
+            color = "#00ff88"
+        elif proximity > 0.7:
+            color = "#ffd700"
+        elif proximity > 0.4:
+            color = "#ff9500"
+        else:
+            color = "#ff6b6b"
+
+        self.progress_canvas.coords(self.progress_bar, 0, 0, bar_width, 30)
+        self.progress_canvas.itemconfig(self.progress_bar, fill=color)
+
     def add_to_history(self, guess, result):
         self.history_text.config(state="normal")
         difference = abs(guess - self.secret_number)
@@ -241,6 +282,8 @@ class GuessNumberGame:
         self.history_text.config(state="normal")
         self.history_text.delete("1.0", tk.END)
         self.history_text.config(state="disabled")
+
+        self.progress_canvas.coords(self.progress_bar, 0, 0, 0, 30)
 
         difficulty = self.difficulty_var.get()
         self.max_range = {"Easy": 50, "Medium": 100, "Hard": 200}[difficulty]
@@ -280,6 +323,7 @@ class GuessNumberGame:
         self.attempts_label.config(text=f"Attempts: {self.attempts}")
 
         difference = abs(guess - self.secret_number)
+        self.update_progress_bar(difference)
 
         if guess < self.secret_number:
             result = "📈 TOO LOW"
