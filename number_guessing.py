@@ -7,6 +7,7 @@ import os
 
 class GuessNumberGame:
     def __init__(self):
+
         self.window = tk.Tk()
         self.window.title("🎯 Guess the Number")
         self.window.geometry("550x800")
@@ -24,6 +25,17 @@ class GuessNumberGame:
         self.load_stats()
         self.setup_ui()
         self.bind_shortcuts()
+
+    def blink_label(self, count=6):
+        """
+        Blink the result_label to celebrate a win.
+        count
+        """
+        if count == 0:
+            return
+        color = "#00ff88" if count % 2 else "white"  # зелено ↔ бяло
+        self.result_label.config(fg=color)
+        self.window.after(150, lambda: self.blink_label(count - 1))
 
     def load_stats(self):
         if os.path.exists(self.stats_file):
@@ -344,7 +356,7 @@ class GuessNumberGame:
 
             diff = self.difficulty_var.get()
             current_best = self.best_scores.get(diff)
-
+            self.blink_label(6)
             if not current_best or self.attempts < current_best:
                 self.best_scores[diff] = self.attempts
                 self.save_stats()
