@@ -9,7 +9,7 @@ class GuessNumberGame:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("🎯 Guess the Number")
-        self.window.geometry("550x750")
+        self.window.geometry("550x800")
         self.window.resizable(False, False)
         self.window.configure(bg="#1a1a2e")
 
@@ -167,7 +167,7 @@ class GuessNumberGame:
         progress_frame = tk.LabelFrame(
             main_container,
             text="🎯 Proximity Meter",
-            font=("Arial", 13, "bold"),
+            font=("Arial", 12, "bold"),
             bg="#0f3460",
             fg="#00ff88",
             padx=10,
@@ -208,21 +208,20 @@ class GuessNumberGame:
         history_frame = tk.LabelFrame(
             main_container,
             text="📜 Guess History",
-            font=("Arial", 13, "bold"),
+            font=("Arial", 12, "bold"),
             bg="#0f3460",
             fg="#00ff88",
             padx=10,
             pady=10
         )
-        history_frame.pack(pady=1, fill="both", expand=True)
+        history_frame.pack(pady=10, fill="both", expand=True)
 
         self.history_text = scrolledtext.ScrolledText(
             history_frame,
-            height=6,
-            font=("Courier", 9),
+            height=8,
+            font=("Courier", 12),
             bg="#16213e",
-            fg="#00ff88",
-            state="disabled"
+            fg="#00ff88"
         )
         self.history_text.pack(fill="both", expand=True)
 
@@ -265,11 +264,9 @@ class GuessNumberGame:
         self.progress_canvas.coords(self.progress_bar, 0, 0, bar_width, 30)
         self.progress_canvas.itemconfig(self.progress_bar, fill=color)
 
-    def add_to_history(self, guess, result):
+    def add_to_history(self, guess, result, difference):
         self.history_text.config(state="normal")
-        difference = abs(guess - self.secret_number)
         proximity = self.get_proximity_hint(difference)
-
         entry = f"#{self.attempts}: {guess} → {result} | {proximity}\n"
         self.history_text.insert("1.0", entry)
         self.history_text.config(state="disabled")
@@ -328,20 +325,20 @@ class GuessNumberGame:
         if guess < self.secret_number:
             result = "📈 TOO LOW"
             self.result_label.config(text=result, fg="#ff6b6b")
-            self.add_to_history(guess, "Low")
+            self.add_to_history(guess, "Low", difference)
             proximity = self.get_proximity_hint(difference)
             self.hint_label.config(text=proximity)
         elif guess > self.secret_number:
             result = "📉 TOO HIGH"
             self.result_label.config(text=result, fg="#4ecdc4")
-            self.add_to_history(guess, "High")
+            self.add_to_history(guess, "High", difference)
             proximity = self.get_proximity_hint(difference)
             self.hint_label.config(text=proximity)
         else:
             self.game_active = False
             self.result_label.config(text=f"🎉 CORRECT! The number was {self.secret_number}", fg="#00ff88")
             self.hint_label.config(text=f"You won in {self.attempts} attempts!")
-            self.add_to_history(guess, "✓ WIN")
+            self.add_to_history(guess, "✓ WIN", 0)
             self.guess_btn.config(state="disabled")
             self.guess_entry.config(state="disabled")
 
